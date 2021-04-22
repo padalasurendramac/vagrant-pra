@@ -2,7 +2,15 @@ Vagrant.configure("2") do |config|
   config.vm.box = "centos/7"
 end
 
-
+---------------------------------------
+$script = <<-SCRIPT
+sudo apt update
+sudo apt upgrade -y
+SCRIPT
+Vagrant.configure("2") do |config|
+  config.vm.box = "ktr/mininet"  
+  config.vm.provision "shell", inline: $script
+end
 
 -----------------------------------------------
 
