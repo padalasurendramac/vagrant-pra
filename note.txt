@@ -1,0 +1,9 @@
+
+for windows sync folder
+first  need to share the folder
+and mentioned like this below
+
+config.vm.synced_folder "//SURYA/Users/LENOVO/Pictures/test/new", "/var/logs", type: "rsync"
+
+anyother way
+ config.vm.synced_folder ".", "/vagrant", type: "rsync"
