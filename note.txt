@@ -7,3 +7,32 @@ config.vm.synced_folder "//SURYA/Users/LENOVO/Pictures/test/new", "/var/logs", t
 
 anyother way
  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+ 
+ 
+ 
+Vagrant.configure("2") do |config|
+    config.vm.define "jenkins" do |subconfig|
+        subconfig.vm.box = "centos/7"
+        subconfig.vm.hostname = "jenkins"
+        subconfig.vm.network :private_network, ip: "10.0.0.10"
+        subconfig.vm.provider :virtualbox do |v|
+            v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+            v.customize ["modifyvm", :id, "--memory", 512]
+            v.customize ["modifyvm", :id, "--name", "jenkins"]
+        end
+        subconfig.vm.provision "ansible_local" do |ansible|
+            ansible.playbook = "provision/playbook.yml"
+            ansible.verbose = true
+        end
+    end
+    config.vm.define "docker" do |db|
+        db.vm.box = "centos/7"
+        db.vm.hostname = "docker"
+        db.vm.network :private_network, ip: "10.0.0.20"
+        db.vm.provider :virtualbox do |v|
+            v.customize ["modifyvm", :id, "--natdnshostresolver2", "on"]
+            v.customize ["modifyvm", :id, "--memory", 512]
+            v.customize ["modifyvm", :id, "--name", "docker"]
+        end
+    end  
+ end 
