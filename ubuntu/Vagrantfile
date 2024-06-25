@@ -1,0 +1,19 @@
+Vagrant.configure("2") do |config|
+  # Base box
+  config.vm.box = "ubuntu/bionic64"
+
+  # Configure the first network interface (NAT)
+  config.vm.network "private_network", type: "dhcp"
+
+  # Configure the second network interface (Host-Only)
+  config.vm.network "private_network", type: "static", ip: "192.168.56.10"
+
+  # Configure the third network interface (Bridged)
+  config.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+
+  # Provisioning script (optional)
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y apache2
+  SHELL
+end
