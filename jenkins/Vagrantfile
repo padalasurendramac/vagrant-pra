@@ -1,0 +1,33 @@
+Vagrant.configure("2") do |config|
+  # Base box
+  config.vm.box = "ubuntu/bionic64"
+
+  # Configure the first network interface (NAT)
+  config.vm.network "private_network", type: "dhcp"
+
+  # Configure the second network interface (Host-Only)
+  config.vm.network "private_network", type: "static", ip: "192.168.56.10"
+
+  # Configure the third network interface (Bridged)
+  config.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+
+  # Provisioning script (optional)
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	sudo apt-get update
+	sudo apt-get install -y docker-ce
+	sudo systemctl start docker
+	sudo systemctl enable docker
+	sudo usermod -aG docker ubuntu
+	sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+	sudo chmod +x /usr/local/bin/docker-compose
+	docker run -d -p 8080:8080 -p 50000:50000 -d -v /var/run/docker.sock:/var/run/docker.sock -v jenkins_home:/var/jenkins_home --name my-jenkins jenkins/jenkins:lts
+#	docker run -p 8080:8080 -p 50000:50000 -d -v /var/run/docker.sock:/var/run/docker.sock -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts
+    sleep 5
+	docker exec -u root my-jenkins bash -c "curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./dockerinstall"
+	sudo chmod 666 /var/run/docker.sock
+  SHELL
+end
